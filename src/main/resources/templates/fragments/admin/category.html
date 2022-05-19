@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="" xmlns:sec="">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Restaurant - Login Page</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+</head>
+<body>
+<div th:fragment="category" class="tab-pane fade" id="v-pills-categories" role="tabpanel" aria-labelledby="v-pills-categories-tab" tabindex="0">
+  <div class="container-fluid">
+    <div class="d-flex justify-content-start align-items-center">
+      <h1 class="me-auto">Admin - Category</h1>
+      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#categoryModal">Add Category</button>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col" class="text-end">Control</th>
+          </tr>
+        </thead>
+        <tbody class="table-group-divider" id="category-list">
+          <tr>
+            <th scope="row">1</th>
+            <td>Combos</td>
+            <td class="text-end">
+              <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#categoryModal" data-bs-categoryId="1">Edit</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="modal fade" id="categoryModal" tabindex="-1" aria-labelledby="categoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="categoryModalLabel"></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="categoryForm" th:action="@{/admin/categories}" method="post">
+            <div class="mb-3">
+              <label for="category-name" class="col-form-label">Name:</label>
+              <input type="text" class="form-control" id="category-name" name="name" required>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button form="categoryForm" type="submit" class="btn btn-primary" id="category-submit">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+<script th:fragment="category-script">
+    var base_url = 'http://localhost:8080/admin';
+
+    document.onreadystatechange = function () {
+        if (document.readyState == "interactive") {
+            // Initialize your application or run some code.
+            const categoryModal = document.getElementById('categoryModal');
+            const categoryForm = document.getElementById('categoryForm');
+            const title = document.getElementById('categoryModalLabel');
+            const submit = document.getElementById('category-submit');
+            const nameInput = document.getElementById('category-name');
+
+            let categoryId = null;
+
+            categoryModal.addEventListener('show.bs.modal', event => {
+              const button = event.relatedTarget;
+
+              categoryId = button.getAttribute('data-bs-categoryId');
+
+              title.innerHTML = 'Add Category';
+              submit.innerHTML = 'Save';
+              nameInput.value = '';
+
+              if(!!categoryId) {
+                title.innerHTML = 'Update Category';
+
+                const categoryName = button.getAttribute('data-bs-categoryName');
+
+                nameInput.value = categoryName;
+                submit.innerHTML = 'Update';
+              }
+            });
+
+           categoryFormEvent = categoryForm.addEventListener('submit', async event => {
+              event.preventDefault();
+
+                let url = `${base_url}/categories`;
+                let method = 'POST';
+
+                let data = {
+                  name: nameInput.value
+                };
+
+                console.log(data);
+
+                if(!!categoryId) {
+                  url += `/${categoryId}`;
+                  method = 'PUT';
+                  data = {
+                    ...data,
+                    id: +categoryId
+                  };
+                }
+
+                const response = await fetch(url, {
+                  method,
+                  headers: {
+                    'Content-Type': 'application/json'
+                    // 'Content-Type': 'application/x-www-form-urlencoded',
+                  },
+                  body: JSON.stringify(data)
+                });
+
+                loadCategories();
+                categoryModal.classList.remove('show');
+                document.getElementsByClassName('modal-backdrop')[0].remove();
+            });
+
+            const categoryNav = document.getElementById('v-pills-categories-tab');
+
+            categoryNav.addEventListener('click', event => {
+              loadCategories();
+            });
+        }
+    }
+
+
+    function loadCategories() {
+      const list = document.getElementById('category-list');
+      list.innerHTML = '';
+      fetch(`${base_url}/categories`)
+      .then(response => response.json())
+      .then(data => {
+          if(list.count == 0) {
+              list.innerHTML = '<tr><th scope="row" colspan="3">No records</th></tr>';
+              return;
+          }
+
+          let count = 1;
+          data.map(cat => {
+              list.innerHTML += `<tr><th scope="row">${count}</th><td>${cat.name}</td><td class="text-end"><button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#categoryModal" data-bs-categoryName="${cat.name}" data-bs-categoryId="${cat.id}">Edit</button></td></tr>`;
+              count++;
+          });
+      });
+    }
+</script>
+</body>
+</html>

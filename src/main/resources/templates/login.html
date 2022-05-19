@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="" xmlns:sec="">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>The Restaurant - Login Page</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+</head>
+<body>
+<div class="container">
+    <nav th:replace="fragments/header :: header"></nav>
+    <main>
+        <div class="m-auto my-4" style="max-width: 500px">
+            <h3 class="text-center fw-bold">Login Page</h3>
+            <form th:action="@{/login}" method="POST">
+                <div class="row g-3">
+                    <div th:if="${param.error}" class="col-12 mb-0 mt-4 alert alert-danger fw-bold">
+                        Invalid username and password.
+                    </div>
+                    <div class="col-12">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" id="username" name="username" class="form-control" required />
+                    </div>
+                    <div class="col-12">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" id="password" name="password" class="form-control" required />
+                    </div>
+                    <div class="col-12">
+                        <button class="w-100 btn btn-primary btn-lg mt-3" type="submit">Login</button>
+                    </div>
+                    <div class="col-12 text-right">
+                        <a th:href="@{/register}" class="nav-link text-sm ps-0">No account? Register here.</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+</body>
+</html>
