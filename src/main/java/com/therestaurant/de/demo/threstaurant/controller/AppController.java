@@ -50,6 +50,10 @@ public class AppController {
 
     @GetMapping("/")
     public String showHome() {
+        if(((User)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getIsAdmin()) {
+            return "redirect:/admin";
+        }
+
         return "home";
     }
 }

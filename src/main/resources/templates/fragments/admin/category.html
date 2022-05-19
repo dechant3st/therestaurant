@@ -19,16 +19,13 @@
           <tr>
             <th scope="col">#</th>
             <th scope="col">Name</th>
+            <th scope="col">Status</th>
             <th scope="col" class="text-end">Control</th>
           </tr>
         </thead>
         <tbody class="table-group-divider" id="category-list">
           <tr>
-            <th scope="row">1</th>
-            <td>Combos</td>
-            <td class="text-end">
-              <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#categoryModal" data-bs-categoryId="1">Edit</button>
-            </td>
+            <th scope="row" colspan="4">No record found</th>
           </tr>
         </tbody>
       </table>
@@ -45,8 +42,15 @@
         <div class="modal-body">
           <form id="categoryForm" th:action="@{/admin/categories}" method="post">
             <div class="mb-3">
-              <label for="category-name" class="col-form-label">Name:</label>
+              <label for="category-name" class="col-form-label">Name</label>
               <input type="text" class="form-control" id="category-name" name="name" required>
+            </div>
+            <div class="mb-3">
+              <label for="category-status" class="col-form-label">Status</label>
+              <select id="category-status" class="form-control" name="status" required>
+                <option value="0">Active</option>
+                <option value="1">Not Active</option>
+              </select>
             </div>
           </form>
         </div>
@@ -60,99 +64,233 @@
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
 <script th:fragment="category-script">
-    var base_url = 'http://localhost:8080/admin';
+    var base_url = 'http://localhost:8080/api/admin';
 
     document.onreadystatechange = function () {
-        if (document.readyState == "interactive") {
-            // Initialize your application or run some code.
-            const categoryModal = document.getElementById('categoryModal');
-            const categoryForm = document.getElementById('categoryForm');
-            const title = document.getElementById('categoryModalLabel');
-            const submit = document.getElementById('category-submit');
-            const nameInput = document.getElementById('category-name');
+      if (document.readyState == "interactive") {
+          // Initialize your application or run some code.
+          const categoryModal = document.getElementById('categoryModal');
+          const categoryForm = document.getElementById('categoryForm');
+          const title = document.getElementById('categoryModalLabel');
+          const submit = document.getElementById('category-submit');
+          const nameInput = document.getElementById('category-name');
+          const statusInput = document.getElementById('category-status');
 
-            let categoryId = null;
+          let categoryId = null;
 
-            categoryModal.addEventListener('show.bs.modal', event => {
-              const button = event.relatedTarget;
+          categoryModal.addEventListener('show.bs.modal', event => {
+            const button = event.relatedTarget;
 
-              categoryId = button.getAttribute('data-bs-categoryId');
+            categoryId = button.getAttribute('data-bs-categoryId');
 
-              title.innerHTML = 'Add Category';
-              submit.innerHTML = 'Save';
-              nameInput.value = '';
+            title.innerHTML = 'Add Category';
+            submit.innerHTML = 'Save';
+            nameInput.value = '';
+            statusInput.options[0].selected = true;
+
+            if(!!categoryId) {
+              title.innerHTML = 'Update Category';
+
+              const categoryName = button.getAttribute('data-bs-categoryName');
+              const categoryStatus = button.getAttribute('data-bs-categoryStatus');
+
+              nameInput.value = categoryName;
+              statusInput.options[categoryStatus].selected = true;
+
+              submit.innerHTML = 'Update';
+            }
+          });
+
+         categoryFormEvent = categoryForm.addEventListener('submit', async event => {
+            event.preventDefault();
+
+            const csrfToken = document.cookie.replace(/(?:(?:^|.*;\s*)XSRF-TOKEN\s*\=\s*([^;]*).*$)|^.*$/, '$1');
+
+              let url = base_url + '/categories';
+              let method = 'POST';
+
+              let data = {
+                name: nameInput.value,
+                status: +statusInput.value
+              };
+
+              console.log(data);
 
               if(!!categoryId) {
-                title.innerHTML = 'Update Category';
-
-                const categoryName = button.getAttribute('data-bs-categoryName');
-
-                nameInput.value = categoryName;
-                submit.innerHTML = 'Update';
-              }
-            });
-
-           categoryFormEvent = categoryForm.addEventListener('submit', async event => {
-              event.preventDefault();
-
-                let url = `${base_url}/categories`;
-                let method = 'POST';
-
-                let data = {
-                  name: nameInput.value
+                url += `/${categoryId}`;
+                method = 'PUT';
+                data = {
+                  ...data,
+                  id: +categoryId
                 };
+              }
 
-                console.log(data);
+              const response = await fetch(url, {
+                method,
+                headers: {
+                  'Content-Type': 'application/json',
+                  // 'Content-Type': 'application/x-www-form-urlencoded',
+                  'X-XSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify(data)
+              });
 
-                if(!!categoryId) {
-                  url += `/${categoryId}`;
-                  method = 'PUT';
-                  data = {
-                    ...data,
-                    id: +categoryId
-                  };
+              loadCategoriesList();
+              categoryModal.classList.remove('show');
+              categoryModal.style.display = 'none';
+              document.getElementsByClassName('modal-backdrop')[0].remove();
+          });
+
+          const categoryNav = document.getElementById('v-pills-categories-tab');
+
+          categoryNav.addEventListener('click', event => {
+          console.log('test');
+            loadCategoriesList();
+          });
+
+          function loadCategoriesList() {
+            const list = document.getElementById('category-list');
+            list.innerHTML = '';
+            fetch(base_url + '/categories')
+            .then(response => response.json())
+            .then(data => {
+                if(data.count == 0) {
+                    list.innerHTML = '<tr><th scope="row" colspan="4">No record found</th></tr>';
+                    return;
                 }
 
-                const response = await fetch(url, {
-                  method,
-                  headers: {
-                    'Content-Type': 'application/json'
-                    // 'Content-Type': 'application/x-www-form-urlencoded',
-                  },
-                  body: JSON.stringify(data)
+                let count = 1;
+                data.map(cat => {
+                    list.innerHTML += `<tr><th scope="row">${count}</th><td>${cat.name}</td><td>${cat.status}</td><td class="text-end"><button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#categoryModal" data-bs-categoryName="${cat.name}" data-bs-categoryId="${cat.id}" data-bs-categoryStatus="${cat.status == 'Active' ? 0 : 1}">Edit</button></td></tr>`;
+                    count++;
                 });
-
-                loadCategories();
-                categoryModal.classList.remove('show');
-                document.getElementsByClassName('modal-backdrop')[0].remove();
-            });
-
-            const categoryNav = document.getElementById('v-pills-categories-tab');
-
-            categoryNav.addEventListener('click', event => {
-              loadCategories();
             });
         }
-    }
 
+        // Menu scripts
+        const menuModal = document.getElementById('menuModal');
+          const menuForm = document.getElementById('menuForm');
+          const mtitle = document.getElementById('menuModalLabel');
+          const msubmit = document.getElementById('menu-submit');
+          const mnameInput = document.getElementById('menu-name');
+          const mdescInput = document.getElementById('menu-desc');
+          const mimageInput = document.getElementById('menu-image');
+          const mstatusInput = document.getElementById('menu-status');
+          const mcategoryInput = document.getElementById('menu-category');
 
-    function loadCategories() {
-      const list = document.getElementById('category-list');
-      list.innerHTML = '';
-      fetch(`${base_url}/categories`)
-      .then(response => response.json())
-      .then(data => {
-          if(list.count == 0) {
-              list.innerHTML = '<tr><th scope="row" colspan="3">No records</th></tr>';
-              return;
+          let menuId = null;
+
+          menuModal.addEventListener('show.bs.modal', event => {
+            const button = event.relatedTarget;
+
+            menuId = button.getAttribute('data-bs-menuId');
+
+            mtitle.innerHTML = 'Add Category';
+            msubmit.innerHTML = 'Save';
+            mnameInput.value = '';
+            mdescInput.value = '';
+            mimageInput.value = '';
+            mcategoryInput.options[0].selected = true;
+            mstatusInput.options[0].selected = true;
+
+            if(!!menuId) {
+              mtitle.innerHTML = 'Update Category';
+
+              mnameInput.value = button.getAttribute('data-bs-menuName');
+              mdescInput.value = button.getAttribute('data-bs-menuDesc');
+              mimageInput.value = button.getAttribute('data-bs-menuImage');
+              mcategoryInput.value = button.getAttribute('data-bs-menuCategory');
+              mstatusInput.options[button.getAttribute('data-bs-menuStatus')].selected = true;
+
+              msubmit.innerHTML = 'Update';
+            }
+          });
+
+         menuFormEvent = menuForm.addEventListener('submit', async event => {
+            event.preventDefault();
+
+            const csrfToken = document.cookie.replace(/(?:(?:^|.*;\s*)XSRF-TOKEN\s*\=\s*([^;]*).*$)|^.*$/, '$1');
+
+              let url = base_url + '/menus';
+              let method = 'POST';
+
+              let data = {
+                name: mnameInput.value,
+                image: mimageInput.value,
+                description: mdescInput.value,
+                status: +mstatusInput.value,
+                category: +mcategoryInput.value
+              };
+
+              console.log(data);
+
+              if(!!menuId) {
+                url += `/${menuId}`;
+                method = 'PUT';
+                data = {
+                  ...data,
+                  id: +menuId
+                };
+              }
+
+              const response = await fetch(url, {
+                method,
+                headers: {
+                  'Content-Type': 'application/json',
+                  // 'Content-Type': 'application/x-www-form-urlencoded',
+                  'X-XSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify(data)
+              });
+
+              loadMenus();
+              menuModal.classList.remove('show');
+              menuModal.style.display = 'none';
+              document.getElementsByClassName('modal-backdrop')[0].remove();
+          });
+
+          const menuNav = document.getElementById('v-pills-menus-tab');
+
+          menuNav.addEventListener('click', event => {
+            loadMenus();
+            loadCategories();
+          });
+
+          function loadCategories() {
+            mcategoryInput.innerHTML = '';
+
+            fetch(base_url + '/categories')
+            .then(response => response.json())
+            .then(data => {
+                if(data.count == 0) {
+                    return;
+                }
+
+                data.map(cat => {
+                  mcategoryInput.innerHTML += `<option value="${cat.id}">${cat.name}</option>`;
+                });
+            });
           }
 
-          let count = 1;
-          data.map(cat => {
-              list.innerHTML += `<tr><th scope="row">${count}</th><td>${cat.name}</td><td class="text-end"><button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#categoryModal" data-bs-categoryName="${cat.name}" data-bs-categoryId="${cat.id}">Edit</button></td></tr>`;
-              count++;
+          function loadMenus() {
+          const list = document.getElementById('menu-list');
+          list.innerHTML = '';
+          fetch(base_url + '/menus')
+          .then(response => response.json())
+          .then(data => {
+              if(data.count == 0) {
+                  list.innerHTML = '<tr><th scope="row" colspan="5">No record found</th></tr>';
+                  return;
+              }
+
+              let count = 1;
+              data.map(menu => {
+                  list.innerHTML += `<tr><th scope="row">${count}</th><td><img src="${menu.image}" class="image-fluid" style="height: 28px"/></td><td>${menu.name}</td><td>${menu.status}</td><td class="text-end"><button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#menuModal" data-bs-menuName="${menu.name}" data-bs-menuId="${menu.id}" data-bs-menuStatus="${menu.status == 'Available' ? 0 : 1}" data-bs-menuDesc="${menu.description}" data-bs-menuImage="${menu.image}" data-bs-menuCategory="${menu.category.id}">Edit</button></td></tr>`;
+                  count++;
+              });
           });
-      });
+        }
+      }
     }
 </script>
 </body>

@@ -19,7 +19,17 @@ public class Category {
     @NotNull
     private String name;
 
+    @Enumerated
+    @NotNull
+    private CategoryStatus status;
+
+    public enum CategoryStatus {
+        Active,
+        Disabled
+    }
+
     public Category(String name) {
         this.name = name;
+        this.status = CategoryStatus.Active;
     }
 }

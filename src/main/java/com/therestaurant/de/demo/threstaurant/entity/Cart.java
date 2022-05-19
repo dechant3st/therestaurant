@@ -2,6 +2,7 @@ package com.therestaurant.de.demo.threstaurant.entity;
 
 import com.therestaurant.de.demo.threstaurant.composite.CartId;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -10,6 +11,7 @@ import javax.validation.constraints.NotNull;
 @Table(name = "carts")
 @Data
 @IdClass(CartId.class)
+@NoArgsConstructor
 public class Cart {
     @Id
     @ManyToOne
@@ -24,4 +26,10 @@ public class Cart {
     @Column(nullable = false)
     @NotNull
     private Integer qty;
+
+    public Cart(User user, Menu menu, Integer qty) {
+        this.user = user;
+        this.menu = menu;
+        this.qty = qty;
+    }
 }

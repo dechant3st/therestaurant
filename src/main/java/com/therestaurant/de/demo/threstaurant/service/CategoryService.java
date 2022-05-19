@@ -37,6 +37,7 @@ public class CategoryService
         return categoryRepository.findById(id)
                 .map(category -> {
                     category.setName(newCategory.getName());
+                    category.setStatus(newCategory.getStatus());
                     return categoryRepository.save(category);
                 })
                 .orElseGet(() -> {

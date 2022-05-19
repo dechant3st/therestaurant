@@ -30,10 +30,10 @@ public class DataLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        loadUserDate();
+        loadUserData();
     }
 
-    private void loadUserDate() {
+    private void loadUserData() {
         if(userRepository.count() == 0) {
             String encodePW = passwordEncoder.encode("admin123");
 

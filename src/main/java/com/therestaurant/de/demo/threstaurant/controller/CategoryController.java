@@ -13,43 +13,37 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
+@RequestMapping("/api/admin/categories")
 public class CategoryController
 {
     @Autowired
     private final CategoryService categoryService;
 
-    private ObjectMapper objectMapper() {
-        return  new ObjectMapper();
-    };
-
-    @GetMapping("/admin/categories")
+    @RequestMapping(method = RequestMethod.GET)
     public List<Category> all()
     {
         return categoryService.all();
     }
 
-    @GetMapping("/admin/categories/{id}")
-    public Category find(@PathVariable Integer id)
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    public Category find(@PathVariable(value = "id") Integer id)
     {
         return categoryService.findById(id);
     }
 
-    @PostMapping("/admin/categories")
-    public String create(@RequestBody String payload)
+    @RequestMapping(method = RequestMethod.POST)
+    public Category create(@RequestBody Category category)
     {
-        return payload;
-//        return categoryService.create(category);
+       return categoryService.create(category);
     }
 
-    @PutMapping("/admin/categories/{id}")
-    public String update(@RequestBody String payload , @PathVariable Integer id) throws JsonProcessingException {
-        return  payload;
-//        Category cat = objectMapper().readValue(category, Category.class);
-//        return categoryService.update(cat, id);
+    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+    public Category update(@PathVariable(value = "id") Integer id, @RequestBody Category category) {
+        return categoryService.update(category, id);
     }
 
-    @DeleteMapping("/admin/categories/{id}")
-    public boolean delete(@PathVariable Integer id)
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    public boolean delete(@PathVariable(value = "id") Integer id)
     {
         return true;
     }
