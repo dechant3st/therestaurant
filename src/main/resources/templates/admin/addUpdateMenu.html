@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="" xmlns:sec="">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>The Restaurant - Admin - Menu Page</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <style>
+        body {
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+        }
+
+        main {
+            height: 100vh;
+            height: -webkit-fill-available;
+            min-height: 100vh;
+        }
+
+        .wrapper {
+            background-color: rgba(0, 0, 0, .1);
+            border: solid rgba(0, 0, 0, .15);
+            border-width: 1px 0;
+            box-shadow: inset 0 0.5em 1.5em rgb(0 0 0 / 10%), inset 0 0.125em 0.5em rgb(0 0 0 / 15%);
+        }
+
+        .bi {
+            width: 22px;
+        }
+    </style>
+</head>
+<body>
+<main class="d-flex flex-nowrap">
+    <div class="d-flex flex-column flex-shrink-0 p-3 bg-white" style="width: 280px;">
+        <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none">
+            <span class="fs-4">The Restaurant</span>
+        </a>
+        <hr>
+        <ul class="nav nav-pills flex-column mb-auto">
+            <li>
+                <a th:href="@{/admin}" class="nav-link">
+                    <span class="bi fa fa-gauge me-1"></span>
+                    Dashboard
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/admin/categories}" class="nav-link">
+                    <span class="bi fa-solid fa-utensils me-1"></span>
+                    Categories
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/admin/menus}" class="nav-link active" aria-current="page">
+                    <span class="bi fa-solid fa-bowl-food me-1"></span>
+                    Menus
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/admin/orders}" class="nav-link">
+                    <span class="bi fa fa-shop me-1"></span>
+                    Orders
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/admin/deliveries}" class="nav-link">
+                    <span class="bi fa fa-truck me-1"></span>
+                    Deliveries
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/admin/customers}" class="nav-link">
+                    <span class="bi fa fa-user me-1"></span>
+                    Customers
+                </a>
+            </li>
+        </ul>
+        <a href="#" onclick="document.getElementById('logout-form').submit();" class="btn btn-dark w-100">Logout</a>
+        <form id="logout-form" th:action="@{/logout}" method="post">
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        </form>
+    </div>
+    <div class="wrapper container-fluid py-2 w-100">
+        <nav class="navbar bg-white p-3 shadow mb-3">
+            <div class="container-fluid">
+               <span th:text="${menu.id != null ? 'Edit Menu' : 'New Menu'}" class="navbar-brand me-auto">
+                   Add Menu
+               </span>
+                <span class="fs-5 fw-bold">
+                   ADMIN
+               </span>
+            </div>
+        </nav>
+
+        <div class="card">
+            <div class="card-body py-5">
+                <form id="t-form" th:object="${menu}" th:method="post" th:action="@{/admin/menus/} + ${menu.id != null ? menu.id : 'add'}" enctype="multipart/form-data">
+                    <input name="_method" type="hidden" th:value="${menu.id != null ? 'PUT' : 'POST'}" />
+                    <div class="container">
+                        <input type="hidden" th:field="*{id}" />
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Name</label>
+                            <input th:field="*{name}" type="text" class="form-control" id="name" name="name" placeholder="Menu Name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Name</label>
+                            <textarea th:field="*{description}" type="text" class="form-control" id="description" row="3" name="description" placeholder="Menu Description" required>
+                            </textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="category" class="form-label">Category</label>
+                            <select id="category" class="form-control" name="category" th:field="*{category}" required>
+                                <option value="" class="d-none">Please select status</option>
+                                <option th:each="category : ${categories}"
+                                        th:value="${category.id}"
+                                        th:text="${category.name}">
+                                </option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="price" class="form-label">Name</label>
+                            <input th:field="*{price}" type="number" class="form-control" id="price" name="price" min="0" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="image" class="form-label">Name</label>
+                            <input type="file" class="form-control" id="image" name="image" accept="image/png, image/jpeg">
+                        </div>
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select id="status" class="form-control" name="status" th:field="*{status}" required>
+                                <option value="" class="d-none">Please select status</option>
+                                <option th:each="menu : ${T(com.therestaurant.de.demo.threstaurant.entity.Menu.MenuStatus).values()}"
+                                        th:value="${menu}"
+                                        th:text="${menu}">
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 mx-auto mt-5" style="max-width: 280px">
+                        <button th:text="${menu.id != null ? 'Update' : 'Save'}" form="t-form" type="submit" class="btn btn-primary">Save</button>
+                        <a th:href="@{/admin/menus}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+</body>
+</html>

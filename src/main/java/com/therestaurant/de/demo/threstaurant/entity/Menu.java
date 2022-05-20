@@ -31,14 +31,19 @@ public class Menu {
     @NotNull
     private String image;
 
+    @Column(nullable = false)
+    @NotNull
+    private float price = 0;
+
     @Enumerated
     @NotNull
     private MenuStatus status;
 
-    public Menu(String name, String description, String image, Category category, MenuStatus status) {
+    public Menu(String name, String description, String image, float price, Category category, MenuStatus status) {
         this.name = name;
         this.description = description;
         this.image = image;
+        this.price = price;
         this.status = status;
         this.category = category;
     }

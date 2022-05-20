@@ -29,7 +29,7 @@ public class User implements UserDetails {
     private String username;
 
     @Column(nullable = false, length = 50)
-    @Size(min = 4, max = 50)
+    @Size(min = 2, max = 50)
     @NotNull
     private String firstname;
 
@@ -38,22 +38,27 @@ public class User implements UserDetails {
     @NotNull
     private String lastname;
 
-    @Column(nullable = false)
+    @Column(nullable = true, length = 100)
     @NotNull
+    private String address;
+
+    @Column(nullable = false)
+    @Size(min = 0, max = 100)
     private String password;
 
     @Column(nullable = false, length = 50)
     private String role;
 
     @Transient
-    private String confirmPassword;
+    private String repeatPassword;
 
-    public User(String username, String password, String firstname, String lastname, String role)
+    public User(String username, String password, String firstname, String lastname, String address, String role)
     {
         this.username = username;
         this.password = password;
         this.firstname = firstname;
         this.lastname = lastname;
+        this.address = address;
         this.role = role;
     }
 
@@ -99,6 +104,6 @@ public class User implements UserDetails {
     }
 
     public boolean getIsAdmin() {
-        return  role == "ADMIN";
+        return  role.equals("ADMIN");
     }
 }

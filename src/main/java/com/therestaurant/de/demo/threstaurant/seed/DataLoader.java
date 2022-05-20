@@ -37,10 +37,10 @@ public class DataLoader implements CommandLineRunner {
         if(userRepository.count() == 0) {
             String encodePW = passwordEncoder.encode("admin123");
 
-            User cust1 = new User("customer1",encodePW,"Kuya Joe","Biden","CUSTOMER");
-            User cust2 = new User("customer2",encodePW,"Kuya Vladimir","Putin","CUSTOMER");
-            User admin1 = new User("admin1",encodePW,"Kuya Noynoy","Aquino","ADMIN");
-            User admin2 = new User("admin2",encodePW,"Manang Leni","Robredo","ADMIN");
+            User cust1 = new User("customer1",encodePW,"Kuya Joe","Biden", "","CUSTOMER");
+            User cust2 = new User("customer2",encodePW,"Kuya Vladimir","Putin", "","CUSTOMER");
+            User admin1 = new User("admin1",encodePW,"Kuya Noynoy","Aquino", "","ADMIN");
+            User admin2 = new User("admin2",encodePW,"Manang Leni","Robredo", "","ADMIN");
 
             userRepository.saveAll(
                     List.of(cust1, cust2, admin1, admin2)
@@ -55,12 +55,12 @@ public class DataLoader implements CommandLineRunner {
                     List.of(cat1, cat2)
             );
 
-            Menu menu1 = new Menu("Combo 1", "This is a sample combo.", "", cat1, Menu.MenuStatus.Available);
-            Menu menu2 = new Menu("Combo 2", "This is a sample combo.", "", cat1, Menu.MenuStatus.Available);
-            Menu menu3 = new Menu("Combo 3", "This is a sample combo.", "", cat1, Menu.MenuStatus.Available);
-            Menu menu4 = new Menu("Appetizer 1", "This is a sample appetizer.", "", cat2, Menu.MenuStatus.Available);
-            Menu menu5 = new Menu("Appetizer 5", "This is a sample appetizer.", "", cat2, Menu.MenuStatus.Available);
-            Menu menu6 = new Menu("Appetizer 6", "This is a sample appetizer.", "", cat2, Menu.MenuStatus.Available);
+            Menu menu1 = new Menu("Combo 1", "This is a sample combo.", "", 20, cat1, Menu.MenuStatus.Available);
+            Menu menu2 = new Menu("Combo 2", "This is a sample combo.", "", 18, cat1, Menu.MenuStatus.Available);
+            Menu menu3 = new Menu("Combo 3", "This is a sample combo.", "", 32.99f, cat1, Menu.MenuStatus.Available);
+            Menu menu4 = new Menu("Appetizer 1", "This is a sample appetizer.", "", 14, cat2, Menu.MenuStatus.Available);
+            Menu menu5 = new Menu("Appetizer 5", "This is a sample appetizer.", "", 12, cat2, Menu.MenuStatus.Available);
+            Menu menu6 = new Menu("Appetizer 6", "This is a sample appetizer.", "", 20, cat2, Menu.MenuStatus.Available);
 
             menuRepository.saveAll(
                     List.of(menu1, menu2, menu3, menu4, menu5, menu6)

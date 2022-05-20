@@ -46,7 +46,7 @@ public class UserService implements UserDetailsService {
             result.addError(nameTaken);
         }
 
-        if(!user.getPassword().equals(user.getConfirmPassword())) {
+        if(!user.getPassword().equals(user.getRepeatPassword())) {
             FieldError confirmPW = new FieldError("user", "confirmPassword", "Please enter the same password");
             result.addError(confirmPW);
         }
@@ -58,6 +58,7 @@ public class UserService implements UserDetailsService {
 
         String encodePW = passwordEncoder.encode(user.getPassword());
         System.out.println(encodePW);
+        user.setRole("CUSTOMER");
         user.setPassword(encodePW);
         userRepository.save(user);
 

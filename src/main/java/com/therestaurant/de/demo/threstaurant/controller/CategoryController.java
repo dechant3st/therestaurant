@@ -1,50 +1,81 @@
 package com.therestaurant.de.demo.threstaurant.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.therestaurant.de.demo.threstaurant.entity.Category;
-import com.therestaurant.de.demo.threstaurant.service.CategoryService;
+import com.therestaurant.de.demo.threstaurant.exception.CategoryNotFoundException;
+import com.therestaurant.de.demo.threstaurant.repo.CategoryRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
 
-@RestController
+@Controller
 @AllArgsConstructor
-@RequestMapping("/api/admin/categories")
 public class CategoryController
 {
     @Autowired
-    private final CategoryService categoryService;
+    private final CategoryRepository categoryRepository;
 
-    @RequestMapping(method = RequestMethod.GET)
-    public List<Category> all()
-    {
-        return categoryService.all();
+    @GetMapping("/admin/categories")
+    public String showCategory(Model model) {
+        List<Category> categories = categoryRepository.findAll();
+        model.addAttribute("categories", categories);
+
+        return "admin/category";
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public Category find(@PathVariable(value = "id") Integer id)
-    {
-        return categoryService.findById(id);
+    @GetMapping("/admin/categories/add")
+    public String showAddCategory(Model model) {
+        model.addAttribute("category", new Category());
+
+        return "admin/addUpdateCategory";
     }
 
-    @RequestMapping(method = RequestMethod.POST)
-    public Category create(@RequestBody Category category)
-    {
-       return categoryService.create(category);
+    @PostMapping("/admin/categories/add")
+    public String addCategory(@Valid @ModelAttribute("category") Category category, BindingResult result) {
+        if(result.hasErrors()) {
+            return "admin/addUpdateCategory";
+        }
+
+        categoryRepository.save(category);
+
+        return "redirect:/admin/categories";
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public Category update(@PathVariable(value = "id") Integer id, @RequestBody Category category) {
-        return categoryService.update(category, id);
+    @GetMapping("/admin/categories/{id}")
+    public String showEditCategory(@PathVariable("id") Integer id, Model model) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new CategoryNotFoundException(id));
+
+        model.addAttribute("category", category);
+
+        return "admin/addUpdateCategory";
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    public boolean delete(@PathVariable(value = "id") Integer id)
-    {
-        return true;
+    @PutMapping("/admin/categories/{id}")
+    public String updateCategory(@PathVariable("id") Integer id, @Valid @ModelAttribute("category") Category category, BindingResult result) {
+        if(result.hasErrors()) {
+            return "admin/addUpdateCategory";
+        }
+
+        if(category.getId() == id) {
+            categoryRepository.save(category);
+        }
+
+        return "redirect:/admin/categories";
+    }
+
+    @DeleteMapping("/admin/categories/{id}")
+    public String deleteCategory(@PathVariable("id") Integer id) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new CategoryNotFoundException(id));
+
+        categoryRepository.delete(category);
+
+        return "redirect:/admin/categories";
     }
 }

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>The Restaurant - Admin - Category Page</title>
+    <title>The Restaurant - Admin - Customer Page</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs5/dt-1.12.1/datatables.min.css"/>
@@ -40,7 +40,7 @@
         <hr>
         <ul class="nav nav-pills flex-column mb-auto">
             <li>
-                <a th:href="@{/admin}" class="nav-link active" aria-current="page">
+                <a th:href="@{/admin}" class="nav-link">
                     <span class="bi fa fa-gauge me-1"></span>
                     Dashboard
                 </a>
@@ -70,7 +70,7 @@
                 </a>
             </li>
             <li>
-                <a th:href="@{/admin/customers}" class="nav-link">
+                <a th:href="@{/admin/customers}" class="nav-link active" aria-current="page">
                     <span class="bi fa fa-user me-1"></span>
                     Customers
                 </a>
@@ -84,18 +84,51 @@
     <div class="wrapper container-fluid py-2 w-100">
         <nav class="navbar bg-white p-3 shadow mb-3">
             <div class="container-fluid">
-                   <span class="navbar-brand me-auto">
-                       Dashboard
-                   </span>
+               <span class="navbar-brand me-auto">
+                   Customers
+               </span>
                 <span class="fs-5 fw-bold">
-                       ADMIN
-                   </span>
+                   ADMIN
+               </span>
             </div>
         </nav>
 
+        <div class="w-100 mb-2 clearfix">
+            <a th:href="@{/admin/customers/add}" class="btn btn-primary btn-lg float-end">Add Customer</a>
+        </div>
+
         <div class="card">
             <div class="card-body">
-
+                <div class="table-responsive">
+                    <table id="customer-table" class="table table-hover w-100">
+                        <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Address</th>
+                            <th>Controls</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="customer: ${customers}" class="align-middle">
+                                <td th:text="${customer.username}"></td>
+                                <td th:text="${customer.firstname}"></td>
+                                <td th:text="${customer.lastname}"></td>
+                                <td th:text="${customer.address}"></td>
+                                <td>
+                                    <div class="d-grid gap-2 d-md-block">
+                                        <a th:href="@{/admin/customers/} + ${customer.id}" class="btn btn-primary btn-sm">Edit</a>
+                                        <a href="#" th:onclick="|if(confirm('Do you want to delete this record?')) { document.getElementById('delete-${customer.id}').submit(); } return false;|" class="btn btn-primary btn-sm">Delete</a>
+                                        <form th:id="'delete-' + ${customer.id}" th:action="@{/admin/customers/} + ${customer.id}" th:method="delete">
+                                            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -106,8 +139,9 @@
 <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/dt-1.12.1/datatables.min.js"></script>
 <script>
         $(document).ready(function() {
-            $('#category-table').DataTable();
+            $('#customer-table').DataTable();
         });
     </script>
+
 </body>
 </html>
