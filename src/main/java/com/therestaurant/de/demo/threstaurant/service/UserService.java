@@ -58,6 +58,7 @@ public class UserService implements UserDetailsService {
 
         String encodePW = passwordEncoder.encode(user.getPassword());
         System.out.println(encodePW);
+        user.setRole("CUSTOMER");
         user.setPassword(encodePW);
         userRepository.save(user);
 

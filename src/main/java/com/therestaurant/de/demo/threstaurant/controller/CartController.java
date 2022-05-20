@@ -23,13 +23,6 @@ public class CartController {
     @RequestMapping(method = RequestMethod.POST)
     public List<Cart> create(@RequestBody CartDto cart)
     {
-        System.out.println(cart);
         return cartService.addToCart(cart);
-    }
-
-    @RequestMapping(value = "/totalItems", method = RequestMethod.GET)
-    public Integer totalItems()
-    {
-        return 0;
     }
 }

@@ -18,6 +18,10 @@
                 <a th:href="@{/login}" class="nav-link">Login</a>
             </li>
 
+            <li sec:authorize="hasAuthority('CUSTOMER')" class="nav-item">
+                <a th:href="@{/cart}" class="nav-link">Cart</a>
+            </li>
+
             <li sec:authorize="isAuthenticated()" class="nav-item">
                 <a href="#" onclick="document.getElementById('logout-form').submit();" class="nav-link">Logout</a>
                 <form id="logout-form" th:action="@{/logout}" method="post">

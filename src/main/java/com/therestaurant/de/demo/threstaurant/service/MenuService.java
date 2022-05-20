@@ -9,6 +9,7 @@ import com.therestaurant.de.demo.threstaurant.repo.MenuRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
@@ -24,6 +25,10 @@ public class MenuService {
     public List<Menu> all()
     {
         return  menuRepository.findAll();
+    }
+
+    public List<Menu> allActive() {
+        return null;
     }
 
     public Menu findById(Integer id)
@@ -57,5 +62,13 @@ public class MenuService {
                     m.setId(id);
                     return menuRepository.save(m);
                 });
+    }
+
+    public void  delete(Integer id) {
+        Optional<Menu> menu = menuRepository.findById(id);
+
+        if(menu.isPresent()) {
+            menuRepository.delete(menu.get());
+        }
     }
 }

@@ -40,4 +40,8 @@ public class MenuController {
         return menuService.update(menu, id);
     }
 
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    public void update(@PathVariable(value = "id") Integer id) {
+        menuService.delete(id);
+    }
 }

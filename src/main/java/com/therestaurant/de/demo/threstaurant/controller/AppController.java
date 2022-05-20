@@ -1,6 +1,8 @@
 package com.therestaurant.de.demo.threstaurant.controller;
 
+import com.therestaurant.de.demo.threstaurant.entity.Cart;
 import com.therestaurant.de.demo.threstaurant.entity.User;
+import com.therestaurant.de.demo.threstaurant.service.CartService;
 import com.therestaurant.de.demo.threstaurant.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @Controller
 @AllArgsConstructor
@@ -21,6 +24,9 @@ public class AppController {
 
     @Autowired
     private final UserService userService;
+
+    @Autowired
+    private final CartService cartService;
 
     @GetMapping("/login")
     public String showLogin() {
@@ -55,5 +61,14 @@ public class AppController {
         }
 
         return "home";
+    }
+
+    @GetMapping("/cart")
+    public String showCart(Model model) {
+        List<Cart> carts = cartService.all();
+
+        model.addAttribute("carts", carts);
+
+        return "cart";
     }
 }

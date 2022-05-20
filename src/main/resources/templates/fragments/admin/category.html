@@ -272,7 +272,7 @@
             });
           }
 
-          function loadMenus() {
+        function loadMenus() {
           const list = document.getElementById('menu-list');
           list.innerHTML = '';
           fetch(base_url + '/menus')
@@ -286,6 +286,34 @@
               let count = 1;
               data.map(menu => {
                   list.innerHTML += `<tr><th scope="row">${count}</th><td><img src="${menu.image}" class="image-fluid" style="height: 28px"/></td><td>${menu.name}</td><td>${menu.status}</td><td class="text-end"><button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#menuModal" data-bs-menuName="${menu.name}" data-bs-menuId="${menu.id}" data-bs-menuStatus="${menu.status == 'Available' ? 0 : 1}" data-bs-menuDesc="${menu.description}" data-bs-menuImage="${menu.image}" data-bs-menuCategory="${menu.category.id}">Edit</button></td></tr>`;
+                  count++;
+              });
+          });
+        }
+
+
+        // Customers
+
+        const customerNav = document.getElementById('v-pills-customers-tab');
+
+        customerNav.addEventListener('click', event => {
+          loadCustomers();
+        });
+
+        function loadCustomers() {
+          const list = document.getElementById('customer-list');
+          list.innerHTML = '';
+          fetch(base_url + '/customers')
+          .then(response => response.json())
+          .then(data => {
+              if(data.count == 0) {
+                  list.innerHTML = '<tr><th scope="row" colspan="5">No record found</th></tr>';
+                  return;
+              }
+
+              let count = 1;
+              data.map(cust => {
+                  list.innerHTML += `<tr><th scope="row">${count}</th><td>${cust.username}</td><td>${cust.firstname}</td><td>${cust.lastname}</td></tr>`;
                   count++;
               });
           });

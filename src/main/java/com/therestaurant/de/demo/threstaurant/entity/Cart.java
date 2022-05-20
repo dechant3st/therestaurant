@@ -1,6 +1,5 @@
 package com.therestaurant.de.demo.threstaurant.entity;
 
-import com.therestaurant.de.demo.threstaurant.composite.CartId;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,15 +9,18 @@ import javax.validation.constraints.NotNull;
 @Entity
 @Table(name = "carts")
 @Data
-@IdClass(CartId.class)
 @NoArgsConstructor
 public class Cart {
+
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Id
+
     @ManyToOne
     @JoinColumn(name = "menu_id")
     private Menu menu;

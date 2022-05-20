@@ -6,13 +6,13 @@ import com.therestaurant.de.demo.threstaurant.entity.Menu;
 import com.therestaurant.de.demo.threstaurant.entity.User;
 import com.therestaurant.de.demo.threstaurant.repo.CartRepository;
 import com.therestaurant.de.demo.threstaurant.repo.MenuRepository;
-import com.therestaurant.de.demo.threstaurant.repo.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class CartService {
@@ -22,28 +22,22 @@ public class CartService {
     @Autowired
     private MenuRepository menuRepository;
 
-    @Autowired
-    private UserRepository userRepository;
-
     public List<Cart> all() {
-        return cartRepository.findAll();
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return cartRepository.findAll()
+                .stream()
+                .filter(cart -> cart.getUser().getId().equals(user.getId()))
+                .collect(Collectors.toList());
     }
 
     public List<Cart> addToCart(CartDto cart) {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Menu menu = menuRepository.getById(cart.getId());
-        System.out.println(menu);
+        Optional<Menu> menu = menuRepository.findById(cart.getId());
 
-        Optional<Cart> dbCart = cartRepository.findCartItem(user.getId(), cart.getId());
-
-        if(dbCart.isPresent()) {
-            Cart newCart = dbCart.get();
-            newCart.setQty(newCart.getQty() + cart.getQty());
-            cartRepository.save(newCart);
-            return cartRepository.findAllByUserId(user.getId());
+        if(menu.isPresent()) {
+            cartRepository.save(new Cart(user, menu.get(), cart.getQty()));
         }
 
-        cartRepository.save(new Cart(user, menu, cart.getQty()));
-        return cartRepository.findAllByUserId(user.getId());
+        return all();
     }
 }
