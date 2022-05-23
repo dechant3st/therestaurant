@@ -3,21 +3,98 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>The Restaurant - Login Page</title>
+  <title>The Restaurant - Cart Page</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
-<div class="container">
-  <nav th:replace="fragments/header :: header"></nav>
+<div class="container py-3">
+  <header>
+    <div class="d-flex flex-column flex-md-row align-items-center pb-3 mb-4 border-bottom">
+      <a href="/" class="d-flex align-items-center text-dark text-decoration-none">
+        <span class="fs-4">The Restaurant</span>
+      </a>
+
+      <nav class="d-inline-flex mt-2 mt-md-0 ms-md-auto">
+        <a sec:authorize="!isAuthenticated()" class="me-3 py-2 text-dark text-decoration-none" th:href="@{/register}">Register</a>
+        <a sec:authorize="!isAuthenticated()" class="py-2 text-dark text-decoration-none" th:href="@{/login}">Login</a>
+
+        <a sec:authorize="isAuthenticated()" class="me-3 py-2 text-dark text-decoration-none" href="#">Cart</a>
+        <div sec:authorize="isAuthenticated()" class="py-2 dropdown">
+          <a sec:authentication="principal.firstname" href="#" class="text-dark text-decoration-none dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="userDropdown">
+            <li><a class="dropdown-item" href="#">My Orders</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a href="#" onclick="document.getElementById('logout-form').submit();" class="dropdown-item">Logout</a>
+              <form id="logout-form" th:action="@{/logout}" method="post">
+                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+              </form>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+  </header>
   <main>
-    <div class="m-auto my-4" style="max-width: 700px">
-      <h3 class="text-center fw-bold">Cart Page</h3>
-      <div class="list-group">
-        <div th:each="cart: ${carts}" class="list-group-item list-group-item-action">
-          <div class="d-flex w-100 justify-content-between align-items-center">
-            <img th:src="${cart.menu.image}" style="width: 90px; height: 70px;" class="image-fluid" />
-            <h5 th:text="${cart.menu.name}"></h5>
-            <span th:text="${cart.qty}" class="badge bg-primary rounded-pill">0</span>
+    <div class="row g-3">
+      <div class="col-8">
+        <div class="card">
+          <div class="card-body py-3">
+            <table id="category-table" class="table table-hover w-100">
+              <thead>
+              <tr>
+                <th>Item Name</th>
+                <th>Unit Price</th>
+                <th>Quantity</th>
+                <th></th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr th:each="cart: ${carts}" class="align-middle">
+                <td th:text="${cart.menu.name}"></td>
+                <td th:text="${#numbers.formatCurrency(cart.menu.price)}"></td>
+                <td th:text="${cart.qty}"></td>
+                <td class="text-end">
+                  <button th:onclick="|document.getElementById('minus-${cart.id}').submit();|" class="btn btn-primary">-</button>
+                  <button th:onclick="|document.getElementById('add-${cart.id}').submit();|" class="btn btn-primary">+</button>
+
+                  <form th:id="'minus-' + ${cart.id}" th:action="@{/carts/} + ${cart.id}" method="post">
+                    <input name="_method" type="hidden" value="PUT" />
+                    <input type="hidden" value="-1" name="value">
+                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                  </form>
+
+                  <form th:id="'add-' + ${cart.id}" th:action="@{/carts/} + ${cart.id}" method="post">
+                    <input name="_method" type="hidden" value="PUT" />
+                    <input type="hidden" value="1" name="value">
+                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                  </form>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="col-4">
+        <div class="card">
+          <div class="card-body">
+            <div class="flex-columns">
+              <h5 class="mb-3 text-center">Checkout Details</h5>
+              <div><b>Total Amount:</b> <span th:text="${#numbers.formatCurrency(totalAmount)}"></span></div>
+
+              <form action='/checkout' method='get' id='checkout-form'>
+                <div class="mb-3">
+                  <label class="form-label fw-bold">Delivery Address</label>
+                  <textarea th:text="@{address}" class="form-control" rows="3" type="text" th:value="${address}" name="address"></textarea>
+                </div>
+              </form>
+
+              <button form="checkout-form" type="submit" class="btn btn-primary btn-lg mt-4">Checkout</button>
+            </div>
           </div>
         </div>
       </div>
@@ -25,5 +102,6 @@
   </main>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 </body>
 </html>
