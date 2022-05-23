@@ -116,9 +116,9 @@
               <td th:text="${order.status}"></td>
               <td>
                 <div class="d-grid gap-2 d-md-block">
-                    <a th:if="(${order.status == T(com.therestaurant.de.demo.threstaurant.entity.Order.OrderStatus).Processing})" href="#" th:onclick="|document.getElementById('deliver-${order.id}').submit()|" class="btn btn-primary btn-sm">Deliver</a>
+                    <a th:if="(${order.status == T(com.therestaurant.de.demo.therestaurant.entity.Order.OrderStatus).Processing})" href="#" th:onclick="|document.getElementById('deliver-${order.id}').submit()|" class="btn btn-primary btn-sm">Deliver</a>
 
-                    <a th:if="(${order.status == T(com.therestaurant.de.demo.threstaurant.entity.Order.OrderStatus).Processing}) or (${order.status == T(com.therestaurant.de.demo.threstaurant.entity.Order.OrderStatus).ForDelivery})" href="#" th:onclick="|document.getElementById('cancel-${order.id}').submit()|" class="btn btn-secondary btn-sm">Cancel</a>
+                    <a th:if="(${order.status == T(com.therestaurant.de.demo.therestaurant.entity.Order.OrderStatus).Processing}) or (${order.status == T(com.therestaurant.de.demo.therestaurant.entity.Order.OrderStatus).ForDelivery})" href="#" th:onclick="|document.getElementById('cancel-${order.id}').submit()|" class="btn btn-secondary btn-sm">Cancel</a>
 
                   <form th:id="'deliver-' + ${order.id}" th:action="@{/admin/orders/} + ${order.id}" th:method="put">
                     <input type="hidden" value="2" name="status"/>

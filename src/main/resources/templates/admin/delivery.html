@@ -116,9 +116,9 @@
               <td th:text="${delivery.status}"></td>
               <td>
                 <div class="d-grid gap-2 d-md-block">
-                  <a th:if="(${delivery.status == T(com.therestaurant.de.demo.threstaurant.entity.Delivery.DeliveryStatus).Processing})" href="#" th:onclick="|document.getElementById('start-${delivery.id}').submit()|" class="btn btn-primary btn-sm">Start</a>
-                  <a th:if="(${delivery.status == T(com.therestaurant.de.demo.threstaurant.entity.Delivery.DeliveryStatus).ForDelivery})" href="#" th:onclick="|document.getElementById('done-${delivery.id}').submit()|" class="btn btn-primary btn-sm">Received</a>
-                  <a th:if="(${delivery.status != T(com.therestaurant.de.demo.threstaurant.entity.Delivery.DeliveryStatus).Delivered}) and (${delivery.status != T(com.therestaurant.de.demo.threstaurant.entity.Delivery.DeliveryStatus).Canceled})" href="#" th:onclick="|document.getElementById('cancel-${delivery.id}').submit()|" class="btn btn-secondary btn-sm">Cancel</a>
+                  <a th:if="(${delivery.status == T(com.therestaurant.de.demo.therestaurant.entity.Delivery.DeliveryStatus).Processing})" href="#" th:onclick="|document.getElementById('start-${delivery.id}').submit()|" class="btn btn-primary btn-sm">Start</a>
+                  <a th:if="(${delivery.status == T(com.therestaurant.de.demo.therestaurant.entity.Delivery.DeliveryStatus).ForDelivery})" href="#" th:onclick="|document.getElementById('done-${delivery.id}').submit()|" class="btn btn-primary btn-sm">Received</a>
+                  <a th:if="(${delivery.status != T(com.therestaurant.de.demo.therestaurant.entity.Delivery.DeliveryStatus).Delivered}) and (${delivery.status != T(com.therestaurant.de.demo.therestaurant.entity.Delivery.DeliveryStatus).Canceled})" href="#" th:onclick="|document.getElementById('cancel-${delivery.id}').submit()|" class="btn btn-secondary btn-sm">Cancel</a>
 
                   <form th:id="'start-' + ${delivery.id}" th:action="@{/admin/deliveries/} + ${delivery.id}" th:method="put">
                     <input type="hidden" value="1" name="status"/>

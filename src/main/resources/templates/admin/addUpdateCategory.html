@@ -105,7 +105,7 @@
                             <label for="status" class="form-label">Status</label>
                             <select id="status" class="form-control" name="status" th:field="*{status}" required>
                                 <option value="" class="d-none">Please select status</option>
-                                <option th:each="category : ${T(com.therestaurant.de.demo.threstaurant.entity.Category.CategoryStatus).values()}"
+                                <option th:each="category : ${T(com.therestaurant.de.demo.therestaurant.entity.Category.CategoryStatus).values()}"
                                         th:value="${category}"
                                         th:text="${category}">
                                 </option>
