@@ -1,11 +1,9 @@
 package com.therestaurant.de.demo.threstaurant.controller;
 
-import com.therestaurant.de.demo.threstaurant.entity.Cart;
-import com.therestaurant.de.demo.threstaurant.entity.Category;
-import com.therestaurant.de.demo.threstaurant.entity.Menu;
-import com.therestaurant.de.demo.threstaurant.entity.User;
+import com.therestaurant.de.demo.threstaurant.entity.*;
 import com.therestaurant.de.demo.threstaurant.repo.CategoryRepository;
 import com.therestaurant.de.demo.threstaurant.repo.MenuRepository;
+import com.therestaurant.de.demo.threstaurant.repo.OrderRepository;
 import com.therestaurant.de.demo.threstaurant.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +30,9 @@ public class AppController {
 
     @Autowired
     private  final MenuRepository menuRepository;
+
+    @Autowired
+    private  final OrderRepository orderRepository;
 
     @GetMapping("/login")
     public String showLogin() {
@@ -74,5 +75,13 @@ public class AppController {
         model.addAttribute("menus", menus);
 
         return "home";
+    }
+
+    @GetMapping("/my-orders")
+    public String showMyOrders(Model model) {
+        List<Order> orders = orderRepository.findAll();
+        model.addAttribute("orders", orders);
+
+        return "order";
     }
 }

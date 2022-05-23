@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="" xmlns:sec="">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Restaurant - My Order Page</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+        .order-header {
+            max-width: 700px;
+        }
+    </style>
+</head>
+<body>
+<div class="container py-3">
+  <header>
+    <div class="d-flex flex-column flex-md-row align-items-center pb-3 mb-4 border-bottom">
+      <a href="/" class="d-flex align-items-center text-dark text-decoration-none">
+        <span class="fs-4">The Restaurant</span>
+      </a>
+
+      <nav class="d-inline-flex mt-2 mt-md-0 ms-md-auto">
+        <a sec:authorize="!isAuthenticated()" class="me-3 py-2 text-dark text-decoration-none" th:href="@{/register}">Register</a>
+        <a sec:authorize="!isAuthenticated()" class="py-2 text-dark text-decoration-none" th:href="@{/login}">Login</a>
+
+        <a sec:authorize="isAuthenticated()" class="me-3 py-2 text-dark text-decoration-none" th:href="@{/carts}">Cart</a>
+        <div sec:authorize="isAuthenticated()" class="py-2 dropdown">
+          <a sec:authentication="principal.firstname" href="#" class="text-dark text-decoration-none dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="userDropdown">
+            <li><a class="dropdown-item" href="#">My Orders</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a href="#" onclick="document.getElementById('logout-form').submit();" class="dropdown-item">Logout</a>
+              <form id="logout-form" th:action="@{/logout}" method="post">
+                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+              </form>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+  </header>
+  <main>
+    <div class="category-header p-3 pb-md-4 mx-auto text-center">
+      <h1 class="display-4 fw-normal">My Orders</h1>
+    </div>
+    <div class="card">
+      <div class="card-body">
+          <table id="order-table" class="table table-hover w-100">
+            <thead>
+            <tr>
+              <th>Order No</th>
+              <th>Total Amount</th>
+              <th>Status</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="order: ${orders}" class="align-middle">
+              <td th:text="${order.id}"></td>
+              <td th:text="${#numbers.formatCurrency(order.totalAmount)}"></td>
+              <td th:text="${order.status}"></td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+    </div>
+  </main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/v/bs5/dt-1.12.1/datatables.min.js"></script>
+<script>
+        $(document).ready(function() {
+            $('#order-table').DataTable();
+        });
+    </script>
+</body>
+</html>
